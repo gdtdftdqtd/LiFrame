@@ -3,11 +3,11 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/llr104/LiFrame/core/orm"
-	"github.com/llr104/LiFrame/dbobject"
+	"github.com/llr104/LiFrame/server/db/dbobject"
 	"github.com/llr104/LiFrame/utils"
 )
 
-func InitDataBase()  {
+func Init()  {
 
 	dbConfig := utils.GlobalObject.AppConfig.DataBase
 	if  dbConfig.Name == "" || dbConfig.User == "" || dbConfig.Password == "" || dbConfig.IP == "" || dbConfig.Port == 0{

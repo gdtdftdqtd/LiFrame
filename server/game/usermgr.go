@@ -1,6 +1,8 @@
 package game
 
-import "github.com/llr104/LiFrame/core/liFace"
+import (
+	"github.com/llr104/LiFrame/core/liFace"
+)
 
 var GUserMgr userMgr
 

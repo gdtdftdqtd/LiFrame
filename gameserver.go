@@ -6,6 +6,7 @@ import (
 	"github.com/llr104/LiFrame/server/app"
 	"github.com/llr104/LiFrame/server/db"
 	"github.com/llr104/LiFrame/server/game"
+	"github.com/llr104/LiFrame/server/gameutils"
 	"github.com/llr104/LiFrame/utils"
 	"os"
 )
@@ -20,14 +21,15 @@ func main() {
 		utils.GlobalObject.Load("conf/game.json")
 	}
 
-	db.InitDataBase()
+	db.Init()
 
 	s := liNet.NewServer()
+	s.AddRouter(&gameutils.STS)
 	s.AddRouter(&game.Enter)
 
-	s.SetOnConnStart(game.ClientConnStart)
-	s.SetOnConnStop(game.ClientConnStop)
-	app.SetShutDownFunc(game.ShutDown)
+	s.SetOnConnStart(gameutils.ClientConnStart)
+	s.SetOnConnStop(gameutils.ClientConnStop)
+	app.SetShutDownFunc(gameutils.ShutDown)
 	app.SetServer(s)
 
 	go app.MasterClient(proto.ServerTypeGame)

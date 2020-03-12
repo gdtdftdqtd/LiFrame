@@ -2,7 +2,7 @@ package game
 
 import (
 	"encoding/json"
-	"github.com/llr104/LiFrame/dbobject"
+	"github.com/llr104/LiFrame/server/db/dbobject"
 	"math/rand"
 	"sync"
 	"time"
@@ -57,7 +57,7 @@ func (s*scene1) EnterScene(userId uint32) bool{
 	defer s.lock.Unlock()
 
 	if len(s.users) < s.maxUser {
-		u := dbobject.User{Id:userId}
+		u := dbobject.User{Id: userId}
 		dbobject.FindUserById(&u)
 		s.users[userId] = &u
 

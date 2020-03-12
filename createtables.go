@@ -3,7 +3,7 @@ package main
 import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/llr104/LiFrame/core/orm"
-	"github.com/llr104/LiFrame/dbobject"
+	"github.com/llr104/LiFrame/server/db/dbobject"
 	"github.com/llr104/LiFrame/utils"
 )
 
@@ -17,6 +17,7 @@ func main() {
 	orm.RegisterDriver("mysql", orm.DRMySQL)
 	orm.RegisterDataBase("default","mysql",dbInfo,maxIdle,maxConn)
 	dbobject.Init()
+
 	orm.RunCommand()
 
 	_, err:= orm.NewOrm().QueryTable(dbobject.User{}).Count()

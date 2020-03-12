@@ -4,12 +4,16 @@ import (
 	"encoding/json"
 	"github.com/llr104/LiFrame/core/liFace"
 	"github.com/llr104/LiFrame/proto"
+	"github.com/llr104/LiFrame/server/gameutils"
+	"github.com/llr104/LiFrame/utils"
 )
 
 var game mainLogic
 
 func init() {
-	game = mainLogic{make(map[int]iScene), false}
+	game = mainLogic{make(map[int]iScene)}
+	gameutils.STS.SetGame(&game)
+
 	s1 := NewScene1()
 	s1.SetId(0)
 	s1.SetName("场景1")
@@ -23,13 +27,10 @@ func init() {
 
 type mainLogic struct {
 	scenes     map[int]iScene
-	isShutDown bool
+
 }
 
 func (s *mainLogic) enterGame(req proto.EnterGameReq) bool{
-	if s.isShutDown {
-		return false
-	}
 
 	return true
 }
@@ -99,9 +100,6 @@ func (s *mainLogic) exitScene(userId uint32, sceneId int, conn liFace.IConnectio
 }
 
 func (s *mainLogic) gameMessage(userId uint32, msgName string, data []byte, conn liFace.IConnection){
-	if s.isShutDown {
-		return
-	}
 
 	if msgName == protoSceneListReq{
 		a := sceneListAck{}
@@ -131,31 +129,41 @@ func (s *mainLogic) gameMessage(userId uint32, msgName string, data []byte, conn
 	}
 }
 
+
+
 /*
 返回true:用户离开了游戏，返回false:用户断线，保留用户的游戏状态
 */
-func (s *mainLogic) userOffLine(userId uint32) bool{
+func (s *mainLogic) UserOffLine(userId uint32) bool{
 
+	r := false
 	if ok, state := GUserMgr.UserIsIn(userId); ok {
 		if t, isOk := s.scenes[state.SceneId]; isOk{
-			return t.UserOffLine(userId)
+			r = t.UserOffLine(userId)
 		}
 	}
 
-	return true
-}
-
-func (s *mainLogic) userLogout(userId uint32) bool{
-	return s.userOffLine(userId)
-}
-
-
-func (s *mainLogic) shutDown(){
-	if s.isShutDown{
-		return
+	ok, state := GUserMgr.UserIsIn(userId)
+	if ok {
+		if r {
+			GUserMgr.UserChangeState(userId, GUserStateLeave, -1,nil)
+		}else{
+			GUserMgr.UserChangeState(userId, GUserStateOffLine, state.SceneId, nil)
+		}
 	}
 
-	//关闭前处理
+	return r
+}
 
-	s.isShutDown = true
+func (s *mainLogic) UserOnLine(userId uint32){
+	utils.Log.Info("UserOnLine: %d", userId)
+}
+
+func (s *mainLogic) UserLogout(userId uint32) bool{
+	return s.UserOffLine(userId)
+}
+
+
+func (s *mainLogic) ShutDown(){
+	utils.Log.Info("ShutDown")
 }

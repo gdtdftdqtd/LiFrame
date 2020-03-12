@@ -4,27 +4,12 @@ import (
 	"encoding/json"
 	"github.com/llr104/LiFrame/core/liFace"
 	"github.com/llr104/LiFrame/core/liNet"
-	"github.com/llr104/LiFrame/dbobject"
 	"github.com/llr104/LiFrame/proto"
 	"github.com/llr104/LiFrame/server/app"
+	"github.com/llr104/LiFrame/server/db/dbobject"
 	"github.com/llr104/LiFrame/utils"
 )
 
-func ClientConnStart(conn liFace.IConnection) {
-	app.MClientData.Inc()
-	utils.Log.Info("ClientConnStart:%s", conn.RemoteAddr().String())
-}
-
-func ClientConnStop(conn liFace.IConnection) {
-	app.MClientData.Dec()
-	app.SessionMgr.SessionExitByConn(conn)
-
-	utils.Log.Info("ClientConnStop:%s", conn.RemoteAddr().String())
-}
-
-func ShutDown(){
-	utils.Log.Info("ShutDown")
-}
 
 var Enter enterWorld
 
